@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinfo Seva Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen pb-20">
+
+    <div class="max-w-md mx-auto p-6">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-orange-600">🙏 Chinfo Seva</h1>
+            <p class="text-slate-500 text-sm">Real-time Sevak Coordination</p>
+        </header>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-8 border border-slate-200">
+            <h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Add New Seva</h3>
+            <div class="flex gap-2">
+                <input id="sevaInput" type="text" placeholder="e.g. Clean the hall" class="flex-1 border p-2 rounded-lg text-sm focus:outline-orange-500">
+                <button onclick="addSeva()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-black">Add</button>
+            </div>
+        </div>
+
+        <div class="space-y-10">
+            <section>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-600 p-1 rounded">🎟️</span> Available Pool
+                </h2>
+                <div id="poolList" class="space-y-3 text-center py-4 text-slate-400 italic">
+                    Loading Sevas...
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <span class="bg-green-100 text-green-600 p-1 rounded">🧡</span> Active Sevas
+                </h2>
+                <div id="queueList" class="space-y-3">
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // 1. YOUR FIREBASE CONFIG GOES HERE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdJmWWkVGOgGEV6wVBJyxU93T8PCZt1hs",
+            authDomain: "chinfo-seva.firebaseapp.com",
+            projectId: "chinfo-seva",
+            storageBucket: "chinfo-seva.appspot.com",
+            messagingSenderId: "861153159601",
+            appId: "1:861153159601:web:fd9624db97bb4d7b5af590"
+        };
+
+        // Initialize
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 2. LISTEN TO DATABASE (Real-time Sync)
+        db.collection("sevas").onSnapshot((snapshot) => {
+            const sevas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            render(sevas);
+        });
+
+        // 3. ADD SEVA
+        async function addSeva() {
+            const input = document.getElementById('sevaInput');
+            if (!input.value) return;
+            
+            await db.collection("sevas").add({
+                title: input.value,
+                status: "available",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            input.value = '';
+        }
+
+        // 4. CLAIM SEVA
+        async function claimSeva(id) {
+            const name = prompt("Enter your name to claim this Seva:");
+            if (!name) return;
+
+            await db.collection("sevas").doc(id).update({
+                status: "claimed",
+                sevak: name
+            });
+        }
+
+        // 5. COMPLETE SEVA
+        async function completeSeva(id) {
+            await db.collection("sevas").doc(id).delete(); 
+        }
+
+        // 6. RENDER UI
+        function render(sevas) {
+            const poolList = document.getElementById('poolList');
+            const queueList = document.getElementById('queueList');
+            
+            let poolHTML = '';
+            let queueHTML = '';
+
+            sevas.forEach(s => {
+                if (s.status === 'available') {
+                    poolHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center animate-in fade-in">
+                            <span class="font-semibold text-slate-700">${s.title}</span>
+                            <button onclick="claimSeva('${s.id}')" class="bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-md shadow-orange-100 hover:bg-orange-600">Claim</button>
+                        </div>
+                    `;
+                } else {
+                    queueHTML += `
+                        <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-sm flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-slate-800">${s.title}</div>
+                                <div class="text-xs text-slate-400">Assigned to: ${s.sevak}</div>
+                            </div>
+                            <button onclick="completeSeva('${s.id}')" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm font-bold hover:bg-green-200">Mark Done</button>
+                        </div>
+                    `;
+                }
+            });
+
+            poolList.innerHTML = poolHTML || '<p class="text-slate-400 py-4 italic">No sevas available. Add one above!</p>';
+            queueList.innerHTML = queueHTML || '<p class="text-slate-400 py-4 italic text-sm">No active sevas yet.</p>';
+        }
+    </script>
+</body>
+</html>
