@@ -5,127 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinfo Seva Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-slate-50 min-h-screen pb-20">
 
     <div class="max-w-md mx-auto p-6">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-extrabold text-orange-600">🙏 Chinfo Seva</h1>
-            <p class="text-slate-500 text-sm">Real-time Sevak Coordination</p>
-        </header>
-
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-8 border border-slate-200">
-            <h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Add New Seva</h3>
-            <div class="flex gap-2">
-                <input id="sevaInput" type="text" placeholder="e.g. Clean the hall" class="flex-1 border p-2 rounded-lg text-sm focus:outline-orange-500">
-                <button onclick="addSeva()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-black">Add</button>
+            <p class="text-slate-500 text-sm mt-1">Real-time Sevak Coordination</p>
+            
+            <div class="mt-5 bg-orange-50 border border-orange-100 rounded-2xl p-4 text-left shadow-sm">
+                <label class="block text-xs font-bold text-orange-700 uppercase tracking-wide mb-1.5">Who is logging in?</label>
+                <select id="userSevakSelect" class="w-full bg-white border border-orange-200 p-2.5 rounded-xl text-sm text-slate-700 focus:outline-orange-500 shadow-inner">
+                    <option value="">-- Choose your name from directory --</option>
+                </select>
             </div>
-        </div>
+        </header>
 
         <div class="space-y-10">
             <section>
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span class="bg-orange-100 text-orange-600 p-1 rounded">🎟️</span> Available Pool
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
+                    <span class="bg-orange-100 text-orange-600 p-1.5 rounded-xl text-base">🎟️</span> Available Pool
                 </h2>
-                <div id="poolList" class="space-y-3 text-center py-4 text-slate-400 italic">
-                    Loading Sevas...
+                <div id="poolList" class="space-y-3">
+                    <p class="text-slate-400 py-4 italic text-center text-sm animate-pulse">Syncing with Google Sheets...</p>
                 </div>
             </section>
 
             <section>
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span class="bg-green-100 text-green-600 p-1 rounded">🧡</span> Active Sevas
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
+                    <span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-xl text-base">🧡</span> Active Sevas
                 </h2>
                 <div id="queueList" class="space-y-3">
-                    </div>
+                    <p class="text-slate-400 py-4 italic text-center text-sm">No active sevas yet.</p>
+                </div>
             </section>
         </div>
     </div>
 
     <script>
-        // 1. YOUR FIREBASE CONFIG GOES HERE
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdJmWWkVGOgGEV6wVBJyxU93T8PCZt1hs",
-            authDomain: "chinfo-seva.firebaseapp.com",
-            projectId: "chinfo-seva",
-            storageBucket: "chinfo-seva.appspot.com",
-            messagingSenderId: "861153159601",
-            appId: "1:861153159601:web:fd9624db97bb4d7b5af590"
-        };
+        // YOUR LIVE GOOGLE APPS SCRIPT URL LINKED DIRECTLY
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6vyOCivrSDjsHoCAVIVPV3eBDqHucTBrxTHFP5l-P-XI7znsoBQRQl31I9VqhElqn/exec";
+        
+        let globalMasterSevaks = [];
 
-        // Initialize
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // 1. FETCH LIVE DATA FROM GOOGLE SHEETS
+        async function loadPortalData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                
+                globalMasterSevaks = data.masterSevaks;
+                
+                populateSevakDropdown(data.masterSevaks);
+                renderPortal(data.portalItems);
+            } catch (error) {
+                console.error("Error connecting to sheet script backend:", error);
+                document.getElementById('poolList').innerHTML = '<p class="text-red-500 py-4 text-center text-sm">Error syncing rows. Refresh page.</p>';
+            }
+        }
 
-        // 2. LISTEN TO DATABASE (Real-time Sync)
-        db.collection("sevas").onSnapshot((snapshot) => {
-            const sevas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            render(sevas);
-        });
-
-        // 3. ADD SEVA
-        async function addSeva() {
-            const input = document.getElementById('sevaInput');
-            if (!input.value) return;
+        // 2. FILL DROPDOWN WITH COPIED DATA FROM 'SEVAKS' TAB
+        function populateSevakDropdown(sevaks) {
+            const select = document.getElementById('userSevakSelect');
+            const currentSelection = select.value;
             
-            await db.collection("sevas").add({
-                title: input.value,
-                status: "available",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            select.innerHTML = '<option value="">-- Choose your name from directory --</option>';
+            sevaks.forEach(s => {
+                select.innerHTML += `<option value="${s.id}">${s.name} (${s.team})</option>`;
             });
-            input.value = '';
+            
+            if(currentSelection) select.value = currentSelection;
         }
 
-        // 4. CLAIM SEVA
-        async function claimSeva(id) {
-            const name = prompt("Enter your name to claim this Seva:");
-            if (!name) return;
+        // 3. CLAIM TASK (UPDATES THE 'MATCHES' TAB IN BACKGROUND)
+        async function claimSeva(matchId) {
+            const selectedSevakId = document.getElementById('userSevakSelect').value;
+            
+            if (!selectedSevakId) {
+                alert("Please pick your name from the dropdown list at the top first!");
+                return;
+            }
 
-            await db.collection("sevas").doc(id).update({
-                status: "claimed",
-                sevak: name
-            });
+            showLoading();
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "claim", matchId: matchId, sevakId: selectedSevakId })
+                });
+                loadPortalData();
+            } catch(e) {
+                alert("Could not register claim. Try again!");
+                loadPortalData();
+            }
         }
 
-        // 5. COMPLETE SEVA
-        async function completeSeva(id) {
-            await db.collection("sevas").doc(id).delete(); 
+        function showLoading() {
+            document.getElementById('poolList').innerHTML = '<p class="text-slate-400 py-4 italic text-center text-sm animate-pulse">Writing data to Google Sheets...</p>';
         }
 
-        // 6. RENDER UI
-        function render(sevas) {
+        // 4. BUILD APPLICATION INTERFACE CARDS
+        function renderPortal(items) {
             const poolList = document.getElementById('poolList');
             const queueList = document.getElementById('queueList');
             
             let poolHTML = '';
             let queueHTML = '';
 
-            sevas.forEach(s => {
-                if (s.status === 'available') {
+            items.forEach(item => {
+                if (item.status === 'available') {
                     poolHTML += `
-                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center animate-in fade-in">
-                            <span class="font-semibold text-slate-700">${s.title}</span>
-                            <button onclick="claimSeva('${s.id}')" class="bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-md shadow-orange-100 hover:bg-orange-600">Claim</button>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center transition-all hover:shadow-md">
+                            <div class="pr-3">
+                                <span class="font-semibold text-slate-700 text-sm block">${item.title}</span>
+                                <p class="text-xs text-slate-400 mt-0.5">${item.description || 'No description added.'}</p>
+                            </div>
+                            <button onclick="claimSeva('${item.matchId}')" class="bg-orange-500 text-white px-4 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-orange-100 hover:bg-orange-600 transition flex-shrink-0">Claim</button>
                         </div>
                     `;
-                } else {
+                } else if (item.status === 'claimed') {
                     queueHTML += `
-                        <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-sm flex justify-between items-center">
+                        <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-sm border border-slate-100 flex justify-between items-center">
                             <div>
-                                <div class="font-bold text-slate-800">${s.title}</div>
-                                <div class="text-xs text-slate-400">Assigned to: ${s.sevak}</div>
+                                <div class="font-bold text-slate-800 text-sm">${item.title}</div>
+                                <div class="text-xs text-slate-400 mt-0.5">Assigned to: <span class="text-emerald-600 font-bold">${item.sevakName}</span> <span class="text-slate-300">|</span> <span class="italic text-slate-500">${item.sevakTeam}</span></div>
                             </div>
-                            <button onclick="completeSeva('${s.id}')" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm font-bold hover:bg-green-200">Mark Done</button>
+                            <span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider flex-shrink-0">In Progress</span>
                         </div>
                     `;
                 }
             });
 
-            poolList.innerHTML = poolHTML || '<p class="text-slate-400 py-4 italic">No sevas available. Add one above!</p>';
-            queueList.innerHTML = queueHTML || '<p class="text-slate-400 py-4 italic text-sm">No active sevas yet.</p>';
+            poolList.innerHTML = poolHTML || '<p class="text-slate-400 py-4 italic text-center text-sm">All cleared! No tasks in the pool.</p>';
+            queueList.innerHTML = queueHTML || '<p class="text-slate-400 py-4 italic text-center text-sm">No active tasks right now.</p>';
         }
+
+        // Start app cycle
+        loadPortalData();
     </script>
 </body>
 </html>
