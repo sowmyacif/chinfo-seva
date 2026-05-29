@@ -3,182 +3,355 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chinfo Seva Board</title>
+<title>CIF Seva Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #f5f3ef;
-    --surface: #ffffff;
-    --surface2: #f0ede8;
-    --border: #e2ddd6;
-    --border2: #ccc8c0;
-    --text: #1a1816;
-    --text2: #6b6660;
-    --text3: #9c9690;
-    --accent: #c84b2f;
+:root {
+  --teal:       #2e7d6e;
+  --teal-dark:  #1f5c51;
+  --teal-light: #e8f4f1;
+  --teal-mid:   #c2ddd9;
+  --gold:       #c8972a;
+  --gold-light: #fdf6e3;
+  --bg:         #f7f5f0;
+  --surface:    #ffffff;
+  --surface2:   #f0ede6;
+  --border:     #ddd9d0;
+  --border2:    #c4bfb5;
+  --text:       #1c1a17;
+  --text2:      #5a5650;
+  --text3:      #9a9590;
 
-    --open: #1d6b4a;     --open-bg: #e8f5ee;
-    --assigned: #1a5c9e; --assigned-bg: #e6f0fb;
-    --inprog: #7a4a0e;   --inprog-bg: #fef3e2;
-    --review: #6b2d7a;   --review-bg: #f5eafb;
-    --done: #3a3a3a;     --done-bg: #eeeeee;
-  }
+  --open:       #2e7d6e;  --open-bg:    #e8f4f1;
+  --assigned:   #1a5c9e;  --assigned-bg:#e6f0fb;
+  --inprog:     #7a4a0e;  --inprog-bg:  #fef3e2;
+  --review:     #6b2d7a;  --review-bg:  #f5eafb;
+  --done:       #3a3a3a;  --done-bg:    #eeeeee;
 
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-sans:  'Source Sans 3', sans-serif;
+  --font-mono:  'DM Mono', monospace;
+}
 
-  header {
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 0 24px; height: 56px; display: flex; align-items: center;
-    justify-content: space-between; position: sticky; top: 0; z-index: 100;
-  }
-  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
-  .logo-dot { width: 28px; height: 28px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .dept-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 8px; padding: 3px; }
-  .dept-tab { padding: 5px 14px; border-radius: 6px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
-  .dept-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .btn-add { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
-  .btn-add:hover { opacity: 0.88; }
+body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  .subbar { padding: 10px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .subbar input[type=text] { border: 1px solid var(--border); background: var(--bg); border-radius: 7px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); width: 220px; outline: none; }
-  .subbar input:focus { border-color: var(--border2); }
-  .stats-row { display: flex; gap: 16px; margin-left: auto; }
-  .stat-chip { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 5px; }
-  .stat-chip strong { color: var(--text); font-weight: 600; }
+/* ── TOP BAR (CIF teal) ── */
+.topbar {
+  background: var(--teal-dark);
+  padding: 0 28px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+.topbar-logo {
+  width: 36px; height: 36px; border-radius: 6px;
+  background: white; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 13px; font-weight: 700;
+  color: var(--teal-dark); letter-spacing: -0.5px; line-height: 1;
+  text-align: center; padding: 2px;
+}
+.topbar-title {
+  font-family: var(--font-serif); font-size: 17px;
+  color: white; letter-spacing: 0.01em;
+}
+.topbar-sub { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
 
-  .board-wrap { padding: 20px 24px; overflow-x: auto; }
-  .board { display: flex; gap: 14px; min-width: max-content; }
+.admin-badge {
+  font-size: 11px; font-weight: 600; padding: 3px 10px;
+  background: rgba(255,255,255,0.15); color: white;
+  border-radius: 20px; border: 1px solid rgba(255,255,255,0.25);
+  display: none;
+}
+.admin-badge.visible { display: inline-block; }
 
-  .col { width: 265px; flex-shrink: 0; display: flex; flex-direction: column; }
-  .col-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px 10px 0 0; border: 1px solid var(--border); border-bottom: none; background: var(--surface); }
-  .col-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
-  .col-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .col-count { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 20px; background: var(--surface2); color: var(--text2); font-family: 'DM Mono', monospace; }
-  .col-body { background: var(--surface2); border: 1px solid var(--border); border-radius: 0 0 10px 10px; padding: 8px; min-height: 500px; display: flex; flex-direction: column; gap: 8px; }
+.btn-admin-login {
+  font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+  padding: 5px 14px; border-radius: 6px; cursor: pointer;
+  background: rgba(255,255,255,0.12); color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: background 0.15s;
+}
+.btn-admin-login:hover { background: rgba(255,255,255,0.22); }
 
-  .seva-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: grab; transition: box-shadow 0.15s, transform 0.15s; position: relative; }
-  .seva-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.09); transform: translateY(-1px); }
-  .seva-card.sortable-ghost { opacity: 0.35; }
-  .seva-card.sortable-chosen { cursor: grabbing; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.btn-assign {
+  font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+  padding: 6px 16px; border-radius: 6px; cursor: pointer;
+  background: var(--gold); color: white; border: none;
+  display: none; transition: opacity 0.15s;
+}
+.btn-assign:hover { opacity: 0.88; }
+.btn-assign.visible { display: inline-block; }
 
-  .card-type { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
-  .card-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 8px; line-height: 1.35; }
-  .card-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
-  .card-footer { display: flex; align-items: center; justify-content: space-between; }
-  .card-sevak { display: flex; align-items: center; gap: 6px; }
-  .avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; flex-shrink: 0; }
-  .avatar-initials { background: var(--assigned-bg); color: var(--assigned); }
-  .avatar-empty { background: var(--surface2); border: 1px dashed var(--border2); color: var(--text3); font-size: 14px; }
-  .sevak-name { font-size: 11px; color: var(--text2); }
-  .card-id { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text3); }
-  .card-actions { display: none; position: absolute; top: 8px; right: 8px; gap: 4px; }
-  .seva-card:hover .card-actions { display: flex; }
-  .btn-icon { width: 22px; height: 22px; border: 1px solid var(--border); background: var(--surface); border-radius: 5px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: background 0.1s; }
-  .btn-icon:hover { background: var(--surface2); color: var(--text); }
+/* ── DEPT BAR ── */
+.deptbar {
+  background: var(--teal);
+  padding: 0 28px;
+  display: flex; align-items: center; gap: 4px;
+  height: 40px;
+}
+.dept-tab {
+  padding: 5px 16px; border-radius: 5px; border: none;
+  background: transparent; font-family: var(--font-sans);
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75);
+  cursor: pointer; transition: all 0.15s;
+}
+.dept-tab.active { background: rgba(255,255,255,0.18); color: white; font-weight: 600; }
+.dept-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
 
-  .dot-open { background: var(--open); }
-  .dot-assigned { background: var(--assigned); }
-  .dot-inprog { background: var(--inprog); }
-  .dot-review { background: var(--review); }
-  .dot-done { background: var(--done); }
+/* ── SUBBAR ── */
+.subbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 9px 28px; display: flex; align-items: center; gap: 14px;
+}
+.subbar input {
+  border: 1px solid var(--border); background: var(--bg); border-radius: 6px;
+  padding: 6px 12px; font-family: var(--font-sans); font-size: 13px;
+  color: var(--text); width: 240px; outline: none;
+}
+.subbar input:focus { border-color: var(--teal-mid); }
+.stats-row { display: flex; gap: 18px; margin-left: auto; }
+.stat-chip { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 5px; }
+.stat-chip strong { color: var(--text); font-weight: 600; }
+.stat-div { color: var(--border2); }
 
-  .loading { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
-  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* ── BOARD ── */
+.board-wrap { padding: 22px 28px; overflow-x: auto; }
+.board { display: flex; gap: 14px; min-width: max-content; }
 
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 12px; padding: 24px; width: 440px; max-width: 92vw; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.12); max-height: 90vh; overflow-y: auto; }
-  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
-  .form-row { margin-bottom: 14px; }
-  .form-row label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
-  .form-row input, .form-row select, .form-row textarea { width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); outline: none; }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--border2); }
-  .form-row textarea { resize: vertical; min-height: 60px; }
-  .form-hint { font-size: 11px; color: var(--text3); margin-top: 3px; }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
-  .btn-cancel { padding: 8px 16px; border: 1px solid var(--border); background: transparent; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--text2); }
-  .btn-save { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.col { width: 268px; flex-shrink: 0; display: flex; flex-direction: column; }
+.col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 13px; border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border); border-bottom: none; background: var(--surface);
+}
+.col-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.col-dot { width: 8px; height: 8px; border-radius: 50%; }
+.col-count {
+  font-size: 11px; font-weight: 500; padding: 2px 7px;
+  border-radius: 20px; background: var(--surface2); color: var(--text2);
+  font-family: var(--font-mono);
+}
+.col-body {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 0 0 8px 8px; padding: 8px;
+  min-height: 480px; display: flex; flex-direction: column; gap: 8px;
+}
 
-  .config-banner { background: #fff8e6; border: 1px solid #f0d080; border-radius: 8px; padding: 12px 16px; margin: 16px 24px 0; font-size: 13px; color: #7a5e10; display: flex; align-items: flex-start; gap: 10px; }
-  .config-banner strong { display: block; margin-bottom: 4px; }
-  .config-banner code { background: #fdefc0; padding: 1px 5px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; }
-  .config-banner.hidden { display: none; }
+/* ── CARD ── */
+.seva-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 7px; padding: 13px; cursor: grab;
+  transition: box-shadow 0.15s, transform 0.15s; position: relative;
+  border-top: 3px solid transparent;
+}
+.seva-card[data-status="Open"]        { border-top-color: var(--open); }
+.seva-card[data-status="Assigned"]    { border-top-color: var(--assigned); }
+.seva-card[data-status="In Progress"] { border-top-color: var(--inprog); }
+.seva-card[data-status="Review"]      { border-top-color: var(--review); }
+.seva-card[data-status="Done"]        { border-top-color: var(--done); }
+.seva-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.09); transform: translateY(-1px); }
+.seva-card.sortable-ghost { opacity: 0.3; }
+.seva-card.sortable-chosen { cursor: grabbing; box-shadow: 0 5px 18px rgba(0,0,0,0.13); }
 
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #1a1816; color: white; padding: 10px 16px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
+.card-type { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+.card-title { font-family: var(--font-serif); font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.35; }
+.card-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+.card-notes { font-size: 11px; color: var(--teal); font-style: italic; margin-bottom: 8px; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-sevak { display: flex; align-items: center; gap: 6px; }
+.avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.avatar-filled { background: var(--teal-light); color: var(--teal-dark); }
+.avatar-empty { background: var(--surface2); border: 1.5px dashed var(--border2); }
+.sevak-name { font-size: 11px; color: var(--text2); }
+.card-id { font-size: 10px; font-family: var(--font-mono); color: var(--text3); }
 
-  .seva-select-group { border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
-  .seva-option { padding: 9px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; transition: background 0.1s; }
-  .seva-option:last-child { border-bottom: none; }
-  .seva-option:hover { background: var(--surface2); }
-  .seva-option.selected { background: var(--assigned-bg); }
-  .seva-option-meta { font-size: 11px; color: var(--text3); }
+/* card admin actions (hidden until hover, only in admin mode) */
+.card-actions { display: none; position: absolute; top: 8px; right: 8px; gap: 4px; }
+.seva-card:hover .card-actions { display: flex; }
+.btn-icon {
+  width: 22px; height: 22px; border: 1px solid var(--border); background: var(--surface);
+  border-radius: 5px; cursor: pointer; font-size: 12px; display: flex;
+  align-items: center; justify-content: center; color: var(--text2); transition: background 0.1s;
+}
+.btn-icon:hover { background: var(--surface2); }
+
+/* pickup button on open cards (public) */
+.btn-pickup {
+  width: 100%; margin-top: 10px;
+  padding: 6px; border-radius: 6px;
+  background: var(--teal-light); color: var(--teal-dark);
+  border: 1px solid var(--teal-mid); font-family: var(--font-sans);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-pickup:hover { background: var(--teal-mid); }
+
+/* dots */
+.dot-open    { background: var(--open); }
+.dot-assigned{ background: var(--assigned); }
+.dot-inprog  { background: var(--inprog); }
+.dot-review  { background: var(--review); }
+.dot-done    { background: var(--done); }
+
+/* ── MODALS ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(20,30,28,0.45); z-index: 300;
+  align-items: center; justify-content: center;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 10px; padding: 28px;
+  width: 440px; max-width: 93vw; max-height: 90vh; overflow-y: auto;
+  border: 1px solid var(--border); box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+}
+.modal-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+}
+.modal-head-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: var(--teal-light);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.modal h3 { font-family: var(--font-serif); font-size: 17px; font-weight: 700; }
+.modal-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.form-row { margin-bottom: 15px; }
+.form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 7px;
+  padding: 9px 11px; font-family: var(--font-sans); font-size: 13px;
+  color: var(--text); background: var(--bg); outline: none;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--teal-mid); box-shadow: 0 0 0 3px rgba(46,125,110,0.1); }
+.form-row textarea { resize: vertical; min-height: 65px; }
+.form-hint { font-size: 11px; color: var(--teal); margin-top: 4px; font-style: italic; }
+.modal-footer { display: flex; gap: 9px; justify-content: flex-end; margin-top: 20px; }
+.btn-cancel { padding: 8px 18px; border: 1px solid var(--border); background: transparent; border-radius: 7px; font-family: var(--font-sans); font-size: 13px; cursor: pointer; color: var(--text2); }
+.btn-primary { padding: 9px 20px; background: var(--teal); color: white; border: none; border-radius: 7px; font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-gold { padding: 9px 20px; background: var(--gold); color: white; border: none; border-radius: 7px; font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* config banner */
+.config-banner {
+  background: #fff8e6; border: 1px solid #f0d080; border-radius: 8px;
+  padding: 11px 16px; margin: 14px 28px 0; font-size: 13px; color: #7a5e10;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.config-banner.hidden { display: none; }
+.config-banner code { background: #fdefc0; padding: 1px 5px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; }
+
+/* loading */
+.loading { text-align: center; padding: 50px; color: var(--text2); font-size: 14px; }
+.spinner { width: 22px; height: 22px; border: 2px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* toast */
+.toast { position: fixed; bottom: 22px; right: 22px; background: var(--teal-dark); color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* admin-only elements hidden by default */
+.admin-only { display: none !important; }
+body.is-admin .admin-only { display: flex !important; }
+body.is-admin .btn-assign { display: inline-block !important; }
+body.is-admin .admin-badge { display: inline-block !important; }
+body.is-admin .btn-pickup { display: none !important; }
 </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">CIF</div>
+    <div>
+      <div class="topbar-title">Seva Board</div>
+      <div class="topbar-sub">Chinmaya International Foundation</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="admin-badge" id="adminBadge">⚙ Admin</span>
+    <button class="btn-admin-login" id="btnAdminLogin" onclick="promptAdminLogin()">Admin Login</button>
+    <button class="btn-assign" id="btnAssign" onclick="openAssignModal()">+ Assign Seva</button>
+  </div>
+</div>
+
+<!-- DEPT BAR -->
+<div class="deptbar" id="deptTabs">
+  <button class="dept-tab active" data-dept="ALL">All Depts</button>
+  <button class="dept-tab" data-dept="HSC">HSC</button>
+  <button class="dept-tab" data-dept="CIF">CIF</button>
+  <button class="dept-tab" data-dept="Media">Media</button>
+</div>
+
+<!-- CONFIG BANNER -->
 <div class="config-banner" id="configBanner">
   <span>⚙️</span>
   <div>
-    <strong>Setup needed — showing sample data</strong>
-    Find <code>SCRIPT_URL</code> in the &lt;script&gt; and replace it with your Google Apps Script Web App URL. See README.md for steps.
+    <strong style="display:block;margin-bottom:3px">Showing sample data — Google Sheet not connected</strong>
+    Set <code>SCRIPT_URL</code> and <code>ADMIN_PASSWORD</code> near the top of the &lt;script&gt; tag. See README.md.
   </div>
-  <button onclick="document.getElementById('configBanner').classList.add('hidden')" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:#7a5e10;line-height:1">×</button>
+  <button onclick="document.getElementById('configBanner').classList.add('hidden')" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:#7a5e10">×</button>
 </div>
 
-<header>
-  <div class="logo">
-    <div class="logo-dot">CS</div>
-    Chinfo Seva Board
-  </div>
-  <div class="header-right">
-    <div class="dept-tabs" id="deptTabs">
-      <button class="dept-tab active" data-dept="ALL">All</button>
-      <button class="dept-tab" data-dept="HSC">HSC</button>
-      <button class="dept-tab" data-dept="CIF">CIF</button>
-      <button class="dept-tab" data-dept="Media">Media</button>
-    </div>
-    <button class="btn-add" onclick="openAddModal()">+ Assign Seva</button>
-  </div>
-</header>
-
+<!-- SUBBAR -->
 <div class="subbar">
-  <input type="text" id="searchInput" placeholder="Search sevas, sevaks…" oninput="renderBoard()">
+  <input type="text" id="searchInput" placeholder="Search sevas, sevaks, type…" oninput="renderBoard()">
   <div class="stats-row" id="statsRow"></div>
 </div>
 
+<!-- BOARD -->
 <div class="board-wrap">
   <div class="board" id="board">
-    <div class="loading"><div class="spinner"></div>Loading…</div>
+    <div class="loading"><div class="spinner"></div>Loading sevas…</div>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h3 id="modalTitle">Assign Seva to Sevak</h3>
+<!-- ADMIN LOGIN MODAL -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal" style="width:360px">
+    <div class="modal-head">
+      <div class="modal-head-icon">🔐</div>
+      <div><h3>Admin Login</h3><div class="modal-sub">Enter password to manage assignments</div></div>
+    </div>
+    <div class="form-row">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkPassword()">
+    </div>
+    <div id="pwError" style="font-size:12px;color:#c0392b;margin-top:-8px;margin-bottom:10px;display:none">Incorrect password</div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeOverlay('loginOverlay')">Cancel</button>
+      <button class="btn-primary" onclick="checkPassword()">Login</button>
+    </div>
+  </div>
+</div>
 
+<!-- ASSIGN MODAL (admin) -->
+<div class="overlay" id="assignOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-icon">📋</div>
+      <div><h3 id="assignTitle">Assign Seva</h3><div class="modal-sub">Link a seva to a sevak</div></div>
+    </div>
     <div class="form-row">
       <label>Seva (task)</label>
-      <select id="fSevaId">
+      <select id="fSevaId" onchange="updateSevaHint()">
         <option value="">— select seva —</option>
       </select>
       <div class="form-hint" id="sevaHint"></div>
     </div>
-
     <div class="form-row">
       <label>Sevak (volunteer)</label>
       <select id="fSevakId">
-        <option value="">— unassigned —</option>
+        <option value="">— unassigned / open —</option>
       </select>
     </div>
-
     <div class="form-row">
       <label>Status</label>
       <select id="fStatus">
@@ -189,15 +362,37 @@
         <option value="Done">Done</option>
       </select>
     </div>
-
     <div class="form-row">
       <label>Notes (optional)</label>
       <textarea id="fNotes" placeholder="Any notes for this assignment…"></textarea>
     </div>
-
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveCard()">Save</button>
+      <button class="btn-cancel" onclick="closeOverlay('assignOverlay')">Cancel</button>
+      <button class="btn-primary" onclick="saveAssignment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PICK UP MODAL (public sevaks) -->
+<div class="overlay" id="pickupOverlay">
+  <div class="modal" style="width:380px">
+    <div class="modal-head">
+      <div class="modal-head-icon">🙏</div>
+      <div><h3 id="pickupTitle">Pick Up Seva</h3><div class="modal-sub" id="pickupSub"></div></div>
+    </div>
+    <div class="form-row">
+      <label>Your name</label>
+      <select id="pSevakId">
+        <option value="">— select your name —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Notes (optional)</label>
+      <textarea id="pNotes" placeholder="Anything to note…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeOverlay('pickupOverlay')">Cancel</button>
+      <button class="btn-gold" onclick="confirmPickup()">Pick Up Seva 🙏</button>
     </div>
   </div>
 </div>
@@ -205,29 +400,29 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── CONFIG ──────────────────────────────────────────────────────
-// Replace with your Google Apps Script Web App URL after deployment
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC1SDEiN5Uj31oWYteYMp6mYOHDLdp_iMSvbzXyf3CjLkMSfZb_qyWqPosQV3zYisw/exec';
+// ─── CONFIG ──────────────────────────────────────────────
+const SCRIPT_URL    = 'https://script.google.com/macros/s/AKfycbyC1SDEiN5Uj31oWYteYMp6mYOHDLdp_iMSvbzXyf3CjLkMSfZb_qyWqPosQV3zYisw/exec';
+const ADMIN_PASSWORD = 'seva2025';   // change this!
+
 const COLUMNS = [
-  { id: 'Open',        label: 'Open',        dotClass: 'dot-open' },
-  { id: 'Assigned',    label: 'Assigned',    dotClass: 'dot-assigned' },
-  { id: 'In Progress', label: 'In Progress', dotClass: 'dot-inprog' },
-  { id: 'Review',      label: 'Review',      dotClass: 'dot-review' },
-  { id: 'Done',        label: 'Done',        dotClass: 'dot-done' },
+  { id:'Open',         label:'Open',        dot:'dot-open' },
+  { id:'Assigned',     label:'Assigned',    dot:'dot-assigned' },
+  { id:'In Progress',  label:'In Progress', dot:'dot-inprog' },
+  { id:'Review',       label:'Review',      dot:'dot-review' },
+  { id:'Done',         label:'Done',        dot:'dot-done' },
 ];
 
-// ─── STATE ───────────────────────────────────────────────────────
-// matches = joined records: { id, seva_id, sevak_id, status, notes,
-//                              title, desc, type, dept,       ← from sevas
-//                              sevak_name }                   ← from sevaks
-let matches = [];
-let sevasList = [];   // raw sevas tab  [{id, title, desc, type, dept}, …]
-let sevaksList = [];  // raw sevaks tab [{id, name, dept, …}, …]
+// ─── STATE ───────────────────────────────────────────────
+let matches   = [];
+let sevasList  = [];
+let sevaksList = [];
 let currentDept = 'ALL';
-let editingId = null;
-let useLocalData = false;
+let isAdmin     = false;
+let editingId   = null;
+let pickupMatchId = null;   // match being picked up
+let useLocalData  = false;
 
-// ─── BOOT ────────────────────────────────────────────────────────
+// ─── BOOT ────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   if (SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE') {
     useLocalData = true;
@@ -250,34 +445,29 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fSevaId').addEventListener('change', updateSevaHint);
 });
 
-// ─── LOAD ────────────────────────────────────────────────────────
+// ─── LOAD ────────────────────────────────────────────────
 async function loadFromSheet() {
   try {
     const r = await fetch(`${SCRIPT_URL}?action=getAll`);
     const data = await r.json();
-    matches   = data.matches;
+    matches    = data.matches;
     sevasList  = data.sevas;
     sevaksList = data.sevaks;
     renderBoard();
-  } catch (e) {
-    console.error(e);
+  } catch(e) {
     ({ matches, sevasList, sevaksList } = getSampleData());
     renderBoard();
-    showToast('Could not reach Google Sheet — showing sample data');
+    showToast('Could not reach Google Sheet — sample data shown');
   }
 }
 
-// ─── RENDER BOARD ────────────────────────────────────────────────
+// ─── RENDER ──────────────────────────────────────────────
 function renderBoard() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
+  const q = document.getElementById('searchInput').value.toLowerCase();
   const filtered = matches.filter(m => {
-    const deptOk   = currentDept === 'ALL' || m.dept === currentDept;
-    const searchOk = !query ||
-      (m.title      || '').toLowerCase().includes(query) ||
-      (m.desc       || '').toLowerCase().includes(query) ||
-      (m.sevak_name || '').toLowerCase().includes(query) ||
-      (m.type       || '').toLowerCase().includes(query);
-    return deptOk && searchOk;
+    const dOk = currentDept === 'ALL' || m.dept === currentDept;
+    const sOk = !q || [m.title, m.desc, m.sevak_name, m.type].some(v => (v||'').toLowerCase().includes(q));
+    return dOk && sOk;
   });
 
   const board = document.getElementById('board');
@@ -289,9 +479,7 @@ function renderBoard() {
     colEl.className = 'col';
     colEl.innerHTML = `
       <div class="col-header">
-        <div class="col-label">
-          <span class="col-dot ${col.dotClass}"></span>${col.label}
-        </div>
+        <div class="col-label"><span class="col-dot ${col.dot}"></span>${col.label}</div>
         <span class="col-count">${cards.length}</span>
       </div>
       <div class="col-body" id="col-${col.id.replace(/ /g,'_')}">
@@ -299,11 +487,14 @@ function renderBoard() {
       </div>`;
     board.appendChild(colEl);
 
-    new Sortable(colEl.querySelector('.col-body'), {
-      group: 'sevaBoard', animation: 200,
-      ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-      onEnd: handleDrop
-    });
+    // only admins can drag
+    if (isAdmin) {
+      new Sortable(colEl.querySelector('.col-body'), {
+        group:'sevaBoard', animation:180,
+        ghostClass:'sortable-ghost', chosenClass:'sortable-chosen',
+        onEnd: handleDrop
+      });
+    }
   });
 
   renderStats(filtered);
@@ -311,112 +502,144 @@ function renderBoard() {
 
 function cardHTML(m) {
   const initials = m.sevak_name
-    ? m.sevak_name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
-    : '';
+    ? m.sevak_name.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase() : '';
   const avatarHTML = m.sevak_name
-    ? `<div class="avatar avatar-initials">${initials}</div><span class="sevak-name">${m.sevak_name}</span>`
-    : `<div class="avatar avatar-empty">+</div><span class="sevak-name" style="color:var(--text3);font-style:italic">unassigned</span>`;
-  const deptBadge = `<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--surface2);color:var(--text2);font-weight:500">${m.dept || ''}</span>`;
-  const sevaRef = m.seva_id ? `<span class="card-id">S${m.seva_id}·M${m.id}</span>` : `<span class="card-id">#${m.id}</span>`;
+    ? `<div class="avatar avatar-filled">${initials}</div><span class="sevak-name">${m.sevak_name}</span>`
+    : `<div class="avatar avatar-empty"></div><span class="sevak-name" style="color:var(--text3);font-style:italic">open</span>`;
+
+  const deptBadge = `<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:var(--teal-light);color:var(--teal-dark);font-weight:600">${m.dept||''}</span>`;
+
+  // pickup button only on Open cards, hidden in admin mode via CSS
+  const pickupBtn = m.status === 'Open'
+    ? `<button class="btn-pickup" onclick="openPickupModal(${m.id})">🙏 Pick Up This Seva</button>` : '';
+
+  // admin edit/delete
+  const adminActions = `
+    <div class="card-actions admin-only">
+      <button class="btn-icon" onclick="openEditModal(${m.id})" title="Edit">✎</button>
+      <button class="btn-icon" onclick="deleteMatch(${m.id})" title="Delete" style="color:#c0392b">✕</button>
+    </div>`;
+
   return `
-    <div class="seva-card" data-id="${m.id}">
-      <div class="card-actions">
-        <button class="btn-icon" onclick="editCard('${m.id}')" title="Edit">✎</button>
-        <button class="btn-icon" onclick="deleteCard('${m.id}')" title="Delete" style="color:#c84b2f">✕</button>
-      </div>
-      <div class="card-type">${m.type || m.dept || ''}</div>
-      <div class="card-title">${m.title || '(untitled)'}</div>
-      ${m.desc ? `<div class="card-desc">${m.desc}</div>` : ''}
-      ${m.notes ? `<div class="card-desc" style="color:var(--text3);font-style:italic">${m.notes}</div>` : ''}
-      <div class="card-footer">
+    <div class="seva-card" data-id="${m.id}" data-status="${m.status}">
+      ${adminActions}
+      <div class="card-type">${m.type||m.dept||''}</div>
+      <div class="card-title">${m.title||'(untitled)'}</div>
+      ${m.desc  ? `<div class="card-desc">${m.desc}</div>`  : ''}
+      ${m.notes ? `<div class="card-notes">📝 ${m.notes}</div>` : ''}
+      ${pickupBtn}
+      <div class="card-footer" style="margin-top:${pickupBtn?'8px':'0'}">
         <div class="card-sevak">${avatarHTML}</div>
-        <div style="display:flex;align-items:center;gap:6px">${deptBadge}${sevaRef}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${deptBadge}
+          <span class="card-id">S${m.seva_id}·M${m.id}</span>
+        </div>
       </div>
     </div>`;
 }
 
-function renderStats(filtered) {
-  const open    = filtered.filter(m => m.status === 'Open').length;
-  const done    = filtered.filter(m => m.status === 'Done').length;
-  const inFlight = filtered.length - open - done;
+function renderStats(f) {
+  const open = f.filter(m=>m.status==='Open').length;
+  const done = f.filter(m=>m.status==='Done').length;
   document.getElementById('statsRow').innerHTML = `
     <div class="stat-chip"><strong>${open}</strong> open</div>
-    <div class="stat-chip" style="color:var(--border2)">|</div>
-    <div class="stat-chip"><strong>${inFlight}</strong> in flight</div>
-    <div class="stat-chip" style="color:var(--border2)">|</div>
+    <div class="stat-chip stat-div">|</div>
+    <div class="stat-chip"><strong>${f.length-open-done}</strong> in flight</div>
+    <div class="stat-chip stat-div">|</div>
     <div class="stat-chip"><strong>${done}</strong> done</div>`;
 }
 
-// ─── DRAG & DROP ─────────────────────────────────────────────────
-async function handleDrop(evt) {
-  const id = evt.item.dataset.id;
-  const newStatus = evt.to.id.replace('col-','').replace(/_/g,' ');
-  const match = matches.find(m => m.id == id);
-  if (!match || match.status === newStatus) return;
-  match.status = newStatus;
-  renderBoard();
-  showToast(`Moved to "${newStatus}"`);
-  if (!useLocalData) {
-    try {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'updateStatus', id, newStatus }) });
-    } catch(e) { showToast('Sync failed — check connection'); }
+// ─── ADMIN AUTH ──────────────────────────────────────────
+function promptAdminLogin() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').style.display = 'none';
+  document.getElementById('loginOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+
+function checkPassword() {
+  if (document.getElementById('pwInput').value === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.body.classList.add('is-admin');
+    document.getElementById('btnAdminLogin').style.display = 'none';
+    closeOverlay('loginOverlay');
+    renderBoard();
+    showToast('Admin mode — you can now assign & manage sevas');
+  } else {
+    document.getElementById('pwError').style.display = 'block';
   }
 }
 
-// ─── MODAL ───────────────────────────────────────────────────────
-function populateDropdowns(selectedSevaId = '', selectedSevakId = '') {
-  const sevaEl  = document.getElementById('fSevaId');
-  const sevakEl = document.getElementById('fSevakId');
-
-  sevaEl.innerHTML = '<option value="">— select seva —</option>' +
-    sevasList.map(s =>
-      `<option value="${s.id}" ${String(s.id) === String(selectedSevaId) ? 'selected' : ''}>${s.title} (${s.dept})</option>`
-    ).join('');
-
-  sevakEl.innerHTML = '<option value="">— unassigned —</option>' +
-    sevaksList.map(s =>
-      `<option value="${s.id}" ${String(s.id) === String(selectedSevakId) ? 'selected' : ''}>${s.name}</option>`
-    ).join('');
-
-  updateSevaHint();
+// ─── DRAG DROP (admin only) ───────────────────────────────
+async function handleDrop(evt) {
+  const id        = evt.item.dataset.id;
+  const newStatus = evt.to.id.replace('col-','').replace(/_/g,' ');
+  const m = matches.find(m => m.id == id);
+  if (!m || m.status === newStatus) return;
+  m.status = newStatus;
+  renderBoard();
+  showToast(`Moved to "${newStatus}"`);
+  if (!useLocalData) {
+    try { await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'updateStatus',id,newStatus})}); }
+    catch(e) { showToast('Sync failed'); }
+  }
 }
 
-function updateSevaHint() {
-  const sevaId = document.getElementById('fSevaId').value;
-  const seva = sevasList.find(s => String(s.id) === String(sevaId));
-  document.getElementById('sevaHint').textContent = seva && seva.desc ? seva.desc : '';
-}
-
-function openAddModal() {
+// ─── ASSIGN MODAL (admin) ────────────────────────────────
+function openAssignModal() {
   editingId = null;
-  document.getElementById('modalTitle').textContent = 'Assign Seva to Sevak';
-  populateDropdowns();
+  document.getElementById('assignTitle').textContent = 'Assign Seva';
+
+  // Only show sevas that have NO active (non-Done) match
+  const activeSevaIds = new Set(
+    matches.filter(m => m.status !== 'Done').map(m => String(m.seva_id))
+  );
+  const available = sevasList.filter(s => !activeSevaIds.has(String(s.id)));
+
+  const sevaEl = document.getElementById('fSevaId');
+  sevaEl.innerHTML = '<option value="">— select seva —</option>' +
+    available.map(s => `<option value="${s.id}">${s.title} (${s.dept})</option>`).join('');
+
+  populateSevakDropdown('fSevakId', '');
   document.getElementById('fStatus').value = 'Open';
-  document.getElementById('fNotes').value = '';
-  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('fNotes').value  = '';
+  updateSevaHint();
+  document.getElementById('assignOverlay').classList.add('open');
 }
 
-function editCard(id) {
+function openEditModal(id) {
   const m = matches.find(m => m.id == id);
   if (!m) return;
   editingId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Assignment';
-  populateDropdowns(m.seva_id, m.sevak_id);
+  document.getElementById('assignTitle').textContent = 'Edit Assignment';
+
+  // For edit: show all sevas (including the current one)
+  const activeSevaIds = new Set(
+    matches.filter(x => x.status !== 'Done' && x.id != id).map(x => String(x.seva_id))
+  );
+  const available = sevasList.filter(s => !activeSevaIds.has(String(s.id)));
+  const sevaEl = document.getElementById('fSevaId');
+  sevaEl.innerHTML = '<option value="">— select seva —</option>' +
+    available.map(s => `<option value="${s.id}" ${String(s.id)===String(m.seva_id)?'selected':''}>${s.title} (${s.dept})</option>`).join('');
+
+  populateSevakDropdown('fSevakId', m.sevak_id);
   document.getElementById('fStatus').value = m.status;
   document.getElementById('fNotes').value  = m.notes || '';
-  document.getElementById('modalOverlay').classList.add('open');
+  updateSevaHint();
+  document.getElementById('assignOverlay').classList.add('open');
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
+function updateSevaHint() {
+  const id   = document.getElementById('fSevaId').value;
+  const seva = sevasList.find(s => String(s.id) === String(id));
+  document.getElementById('sevaHint').textContent = seva?.desc || '';
 }
 
-async function saveCard() {
+async function saveAssignment() {
   const seva_id  = document.getElementById('fSevaId').value;
   const sevak_id = document.getElementById('fSevakId').value;
   const status   = document.getElementById('fStatus').value;
   const notes    = document.getElementById('fNotes').value.trim();
-
   if (!seva_id) { showToast('Please select a seva'); return; }
 
   const seva  = sevasList.find(s  => String(s.id)  === String(seva_id))  || {};
@@ -425,79 +648,121 @@ async function saveCard() {
   if (editingId) {
     const m = matches.find(m => m.id == editingId);
     Object.assign(m, { seva_id, sevak_id, status, notes,
-      title: seva.title, desc: seva.desc, type: seva.type, dept: seva.dept,
-      sevak_name: sevak.name || '' });
-    if (!useLocalData) {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'updateMatch', id: editingId, seva_id, sevak_id, status, notes }) });
-    }
+      title:seva.title||'', desc:seva.desc||'', type:seva.type||'', dept:seva.dept||'',
+      sevak_name:sevak.name||'' });
+    if (!useLocalData) await sync({ action:'updateMatch', id:editingId, seva_id, sevak_id, status, notes });
   } else {
-    const newMatch = { id: Date.now(), seva_id, sevak_id, status, notes,
-      title: seva.title, desc: seva.desc, type: seva.type, dept: seva.dept,
-      sevak_name: sevak.name || '' };
-    matches.unshift(newMatch);
-    if (!useLocalData) {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'addMatch', seva_id, sevak_id, status, notes }) });
-    }
+    const nm = { id:Date.now(), seva_id, sevak_id, status, notes,
+      title:seva.title||'', desc:seva.desc||'', type:seva.type||'', dept:seva.dept||'',
+      sevak_name:sevak.name||'' };
+    matches.unshift(nm);
+    if (!useLocalData) await sync({ action:'addMatch', seva_id, sevak_id, status, notes });
   }
-
-  closeModal();
+  closeOverlay('assignOverlay');
   renderBoard();
   showToast(editingId ? 'Assignment updated' : 'Seva assigned!');
 }
 
-function deleteCard(id) {
+// ─── PICK UP MODAL (public) ──────────────────────────────
+function openPickupModal(matchId) {
+  const m = matches.find(m => m.id == matchId);
+  if (!m) return;
+  pickupMatchId = matchId;
+  document.getElementById('pickupTitle').textContent = m.title;
+  document.getElementById('pickupSub').textContent   = m.desc || m.type || '';
+  populateSevakDropdown('pSevakId', '');
+  document.getElementById('pNotes').value = '';
+  document.getElementById('pickupOverlay').classList.add('open');
+}
+
+async function confirmPickup() {
+  const sevak_id = document.getElementById('pSevakId').value;
+  const notes    = document.getElementById('pNotes').value.trim();
+  if (!sevak_id) { showToast('Please select your name'); return; }
+
+  const m     = matches.find(m => m.id == pickupMatchId);
+  const sevak = sevaksList.find(sk => String(sk.id) === String(sevak_id)) || {};
+  m.sevak_id   = sevak_id;
+  m.sevak_name = sevak.name || '';
+  m.status     = 'Assigned';
+  if (notes) m.notes = notes;
+
+  if (!useLocalData) {
+    await sync({ action:'updateMatch', id:m.id, seva_id:m.seva_id, sevak_id, status:'Assigned', notes:m.notes||'' });
+  }
+  closeOverlay('pickupOverlay');
+  renderBoard();
+  showToast(`Seva picked up! Jai Gurudev 🙏`);
+}
+
+// ─── DELETE ──────────────────────────────────────────────
+async function deleteMatch(id) {
   if (!confirm('Remove this assignment?')) return;
   matches = matches.filter(m => m.id != id);
-  if (!useLocalData) {
-    fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'deleteMatch', id }) });
-  }
+  if (!useLocalData) await sync({ action:'deleteMatch', id });
   renderBoard();
   showToast('Assignment removed');
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+// ─── HELPERS ────────────────────────────────────────────
+function populateSevakDropdown(elId, selectedId) {
+  document.getElementById(elId).innerHTML =
+    '<option value="">— unassigned / open —</option>' +
+    sevaksList.map(s =>
+      `<option value="${s.id}" ${String(s.id)===String(selectedId)?'selected':''}>${s.name}</option>`
+    ).join('');
 }
 
-document.getElementById('modalOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-});
+async function sync(payload) {
+  try { await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) }); }
+  catch(e) { showToast('Sync failed — check connection'); }
+}
 
-// ─── SAMPLE DATA ─────────────────────────────────────────────────
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// close overlays on backdrop click
+document.querySelectorAll('.overlay').forEach(ov =>
+  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); })
+);
+
+// ─── SAMPLE DATA ────────────────────────────────────────
 function getSampleData() {
   const sevas = [
-    { id:101, title:'EPub Accuracy Check Ch 1', desc:'Proofread text against original scanned copy', type:'Accuracy',    dept:'HSC' },
-    { id:102, title:'Transcription BG 2',        desc:'Transcribe VVC discourse audio',              type:'Transcription',dept:'HSC' },
-    { id:103, title:'HSC Content Writing',        desc:'Re-write web page content',                  type:'Writing',      dept:'HSC' },
-    { id:104, title:'EPub Ch 2 Translation',      desc:'Translate chapter 2 to Tamil',               type:'Translation',  dept:'HSC' },
-    { id:105, title:'Telecalling Drive May',       desc:'Call donors for May fundraiser',             type:'Telecalling',  dept:'CIF' },
-    { id:106, title:'Blog - Founder Story',        desc:'Write 800 word blog post',                   type:'Blogging',     dept:'CIF' },
-    { id:107, title:'Fundraising Deck',            desc:'Update Q2 fundraising presentation',         type:'Fundraising',  dept:'CIF' },
-    { id:108, title:'WhatsApp Broadcast Copy',     desc:'Write copy for 3 campaign broadcasts',       type:'Copywriting',  dept:'CIF' },
-    { id:109, title:'Instagram Reels - May',       desc:'Create 4 reels for May calendar',            type:'Social Media', dept:'Media' },
-    { id:110, title:'YouTube Thumbnail Pack',      desc:'Design 10 thumbnails for upload queue',      type:'Design',       dept:'Media' },
+    {id:101,title:'EPub Accuracy Check Ch 1', desc:'Proofread text against original scanned copy', type:'Accuracy',    dept:'HSC'},
+    {id:102,title:'Transcription BG 2',        desc:'Transcribe VVC discourse audio',              type:'Transcription',dept:'HSC'},
+    {id:103,title:'HSC Content Writing',        desc:'Re-write web page content',                  type:'Writing',      dept:'HSC'},
+    {id:104,title:'EPub Ch 2 Translation',      desc:'Translate chapter 2 to Tamil',               type:'Translation',  dept:'HSC'},
+    {id:105,title:'Telecalling Drive May',       desc:'Call donors for May fundraiser',             type:'Telecalling',  dept:'CIF'},
+    {id:106,title:'Blog - Founder Story',        desc:'Write 800 word blog post',                   type:'Blogging',     dept:'CIF'},
+    {id:107,title:'Fundraising Deck',            desc:'Update Q2 fundraising presentation',         type:'Fundraising',  dept:'CIF'},
+    {id:108,title:'WhatsApp Broadcast Copy',     desc:'Write copy for 3 campaign broadcasts',       type:'Copywriting',  dept:'CIF'},
+    {id:109,title:'Instagram Reels - May',       desc:'Create 4 reels for May calendar',            type:'Social Media', dept:'Media'},
+    {id:110,title:'YouTube Thumbnail Pack',      desc:'Design 10 thumbnails for upload queue',      type:'Design',       dept:'Media'},
   ];
   const sevaks = [
-    { id:201, name:'Priya S' },  { id:202, name:'Rahul M' },
-    { id:203, name:'Meera K' },  { id:204, name:'Arjun T' },
-    { id:205, name:'Kavya R' },  { id:206, name:'Nisha P' },
+    {id:201,name:'Priya S'},{id:202,name:'Rahul M'},
+    {id:203,name:'Meera K'},{id:204,name:'Arjun T'},
+    {id:205,name:'Kavya R'},{id:206,name:'Nisha P'},
   ];
   const matches = [
-    { id:1, seva_id:101, sevak_id:null, status:'Open',        notes:'', title:'EPub Accuracy Check Ch 1', desc:'Proofread text against original scanned copy', type:'Accuracy',    dept:'HSC',   sevak_name:'' },
-    { id:2, seva_id:102, sevak_id:201,  status:'Assigned',    notes:'', title:'Transcription BG 2',        desc:'Transcribe VVC discourse audio',              type:'Transcription',dept:'HSC',   sevak_name:'Priya S' },
-    { id:3, seva_id:103, sevak_id:202,  status:'In Progress', notes:'Draft ready, needs review', title:'HSC Content Writing', desc:'Re-write web page content', type:'Writing', dept:'HSC', sevak_name:'Rahul M' },
-    { id:4, seva_id:105, sevak_id:null, status:'Open',        notes:'', title:'Telecalling Drive May',      desc:'Call donors for May fundraiser',             type:'Telecalling',  dept:'CIF',   sevak_name:'' },
-    { id:5, seva_id:106, sevak_id:203,  status:'Review',      notes:'', title:'Blog - Founder Story',       desc:'Write 800 word blog post',                   type:'Blogging',     dept:'CIF',   sevak_name:'Meera K' },
-    { id:6, seva_id:107, sevak_id:204,  status:'In Progress', notes:'', title:'Fundraising Deck',           desc:'Update Q2 fundraising presentation',         type:'Fundraising',  dept:'CIF',   sevak_name:'Arjun T' },
-    { id:7, seva_id:109, sevak_id:null, status:'Open',        notes:'', title:'Instagram Reels - May',      desc:'Create 4 reels for May calendar',            type:'Social Media', dept:'Media', sevak_name:'' },
-    { id:8, seva_id:110, sevak_id:205,  status:'Done',        notes:'All uploaded', title:'YouTube Thumbnail Pack', desc:'Design 10 thumbnails',                type:'Design',       dept:'Media', sevak_name:'Kavya R' },
-    { id:9, seva_id:108, sevak_id:206,  status:'Assigned',    notes:'', title:'WhatsApp Broadcast Copy',    desc:'Write copy for 3 campaign broadcasts',       type:'Copywriting',  dept:'CIF',   sevak_name:'Nisha P' },
-    { id:10,seva_id:104, sevak_id:null, status:'Open',        notes:'', title:'EPub Ch 2 Translation',      desc:'Translate chapter 2 to Tamil',               type:'Translation',  dept:'HSC',   sevak_name:'' },
+    {id:1, seva_id:101,sevak_id:null,status:'Open',       notes:'',              title:'EPub Accuracy Check Ch 1',desc:'Proofread text against original scanned copy',type:'Accuracy',    dept:'HSC',  sevak_name:''},
+    {id:2, seva_id:102,sevak_id:201, status:'Assigned',   notes:'',              title:'Transcription BG 2',       desc:'Transcribe VVC discourse audio',             type:'Transcription',dept:'HSC',  sevak_name:'Priya S'},
+    {id:3, seva_id:103,sevak_id:202, status:'In Progress',notes:'Draft in review',title:'HSC Content Writing',     desc:'Re-write web page content',                 type:'Writing',      dept:'HSC',  sevak_name:'Rahul M'},
+    {id:4, seva_id:105,sevak_id:null,status:'Open',       notes:'',              title:'Telecalling Drive May',    desc:'Call donors for May fundraiser',            type:'Telecalling',  dept:'CIF',  sevak_name:''},
+    {id:5, seva_id:106,sevak_id:203, status:'Review',     notes:'',              title:'Blog - Founder Story',     desc:'Write 800 word blog post',                  type:'Blogging',     dept:'CIF',  sevak_name:'Meera K'},
+    {id:6, seva_id:107,sevak_id:204, status:'In Progress',notes:'',              title:'Fundraising Deck',         desc:'Update Q2 fundraising presentation',        type:'Fundraising',  dept:'CIF',  sevak_name:'Arjun T'},
+    {id:7, seva_id:109,sevak_id:null,status:'Open',       notes:'',              title:'Instagram Reels - May',   desc:'Create 4 reels for May calendar',           type:'Social Media', dept:'Media',sevak_name:''},
+    {id:8, seva_id:110,sevak_id:205, status:'Done',       notes:'All uploaded',  title:'YouTube Thumbnail Pack',  desc:'Design 10 thumbnails',                      type:'Design',       dept:'Media',sevak_name:'Kavya R'},
+    {id:9, seva_id:108,sevak_id:206, status:'Assigned',   notes:'',              title:'WhatsApp Broadcast Copy', desc:'Write copy for 3 campaign broadcasts',      type:'Copywriting',  dept:'CIF',  sevak_name:'Nisha P'},
+    {id:10,seva_id:104,sevak_id:null,status:'Open',       notes:'',              title:'EPub Ch 2 Translation',   desc:'Translate chapter 2 to Tamil',              type:'Translation',  dept:'HSC',  sevak_name:''},
   ];
-  return { matches, sevasList: sevas, sevaksList: sevaks };
+  return { matches, sevasList:sevas, sevaksList:sevaks };
 }
 </script>
 </body>
